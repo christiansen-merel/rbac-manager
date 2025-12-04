@@ -83,6 +83,13 @@ func saMatches(existingSA *v1.ServiceAccount, requestedSA *v1.ServiceAccount) bo
 	return true
 }
 
+func saMatchesExternal(existingSA *v1.ServiceAccount, requestedSA *v1.ServiceAccount) bool {
+    return existingSA.Kind == requestedSA.Kind &&
+           existingSA.APIVersion == requestedSA.APIVersion &&
+           existingSA.Name == requestedSA.Name &&
+		   existingSA.Namespace == requestedSA.Namespace
+}
+
 func metaMatches(existingMeta *metav1.ObjectMeta, requestedMeta *metav1.ObjectMeta) bool {
 	if existingMeta.Name != requestedMeta.Name {
 		return false

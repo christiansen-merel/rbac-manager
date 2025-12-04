@@ -259,3 +259,92 @@ func TestSAMatches(t *testing.T) {
 		t.Fatal("SA 5 should not match SA 4")
 	}
 }
+
+func TestSAExternalMatches(t *testing.T) {
+	sa1 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}},
+	}
+	sa2 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}},
+	}
+	sa3 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds,another"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}, {Name: "another"}},
+	}
+	sa4 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}, {Name: "extra"}},
+	}
+	sa5 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds,another"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}},
+	}
+	sa6 := v1.ServiceAccount{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:            "sample-name",
+			Namespace:       "sample-namespace",
+			OwnerReferences: generateOwnerReferences("foo"),
+			Annotations:     map[string]string{ManagedPullSecretsAnnotationKey: "fairwinds,another"},
+		},
+		ImagePullSecrets: []v1.LocalObjectReference{{Name: "fairwinds"}},
+	}
+
+	if !saMatchesExternal(&sa1, &sa2) {
+		t.Fatal("SA 1 should match SA 2")
+	}
+
+	if !saMatchesExternal(&sa1, &sa3) {
+		t.Fatal("SA 1 should match SA 3")
+	}
+
+	if !saMatchesExternal(&sa4, &sa1) {
+		t.Fatal("SA 4 should match SA 1")
+	}
+
+	if !saMatchesExternal(&sa1, &sa5) {
+		t.Fatal("SA 1 should match SA 3")
+	}
+
+	if !saMatchesExternal(&sa4, &sa3) {
+		t.Fatal("SA 4 should match SA 3")
+	}
+
+	if !saMatchesExternal(&sa5, &sa3) {
+		t.Fatal("SA 5 should match SA 3")
+	}
+
+	if !saMatchesExternal(&sa5, &sa4) {
+		t.Fatal("SA 5 should match SA 4")
+	}
+
+	if saMatchesExternal(&sa6, &sa5) {
+		t.Fatal("SA 6 should not match SA 5")
+	}
+}

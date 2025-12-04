@@ -170,7 +170,7 @@ func (r *Reconciler) reconcileServiceAccounts(requested *[]v1.ServiceAccount) er
 	for _, requestedSA := range *requested {
 		alreadyExists := false
 		for _, existingSA := range existing.Items {
-			if saMatches(&existingSA, &requestedSA) {
+			if saMatchesExternal(&existingSA, &requestedSA) {
 				alreadyExists = true
 				matchingServiceAccounts = append(matchingServiceAccounts, existingSA)
 				break
@@ -188,7 +188,7 @@ func (r *Reconciler) reconcileServiceAccounts(requested *[]v1.ServiceAccount) er
 		if reflect.DeepEqual(existingSA.ObjectMeta.OwnerReferences, r.ownerRefs) {
 			matchingRequest := false
 			for _, matchingSA := range matchingServiceAccounts {
-				if saMatches(&existingSA, &matchingSA) {
+				if saMatchesExternal(&existingSA, &matchingSA) {
 					matchingRequest = true
 					break
 				}
