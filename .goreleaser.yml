@@ -23,6 +23,8 @@ dockers:
   - "quay.io/reactiveops/rbac-manager:{{ .Tag }}-amd64"
   - "quay.io/reactiveops/rbac-manager:v{{ .Major }}-amd64"
   - "quay.io/reactiveops/rbac-manager:v{{ .Major }}.{{ .Minor }}-amd64"
+  - "docker-dev-virtual.repository.pole-emploi.intra/plateforme/rbac-manager:{{ .FullCommit }}-amd64"
+  - "docker-dev-virtual.repository.pole-emploi.intra/plateforme/rbac-manager:v{{ .Version }}-amd64"
   use: buildx
   dockerfile: Dockerfile
   build_flag_templates:
